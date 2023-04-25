@@ -21,6 +21,7 @@ namespace Repositories
             {
                 db.Open();
                 db.Execute(Book.INSERT, book);
+
                 status = true;
             }
             return status;
@@ -30,8 +31,16 @@ namespace Repositories
         {
             using (var db = new SqlConnection(Conn))
             {
-                var books = db.Query<Book>(Book.SELECT_ALL);
+                //JOIN Example:
+                var books = db.Query<Book, Author, Book>(Book.SELECT_ALL, (book, author) =>
+                {
+                    book.Author = author;
+                    return book;
+                }, splitOn: "IdAuthor");
                 return (List<Book>)books;
+
+                //var books = db.Query<Book>(Book.SELECT_ALL);
+                //return (List<Book>)books;
             }
         }
     }
